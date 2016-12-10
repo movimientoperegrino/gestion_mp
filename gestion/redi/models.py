@@ -28,6 +28,7 @@ class Actividades(models.Model):
     class Meta:
         managed = True
         db_table = 'actividades'
+        verbose_name_plural = "Actividades"
 
     def __unicode__(self):
         return self.descripcion
@@ -39,6 +40,7 @@ class ActividadesTipos(models.Model):
     class Meta:
         managed = True
         db_table = 'actividades_tipos'
+        verbose_name_plural = "Tipos de actividades"
 
     def __unicode__(self):
         return self.descripcion
@@ -74,6 +76,8 @@ class Personas(models.Model):
     class Meta:
         managed = True
         db_table = 'personas'
+        verbose_name_plural = "Personas"
+
 
     def __unicode__(self):
         return self.apellido + ", " + self.nombre
@@ -81,4 +85,34 @@ class Personas(models.Model):
     def save(self, *args, **kwargs):
         self.edad = relativedelta(date.today(), self.fecha_nacimiento).years
         return super(Personas, self).save(*args, **kwargs)
+
+
+class Planteles(models.Model):
+    plantel_id = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=255, blank=True, null=True)
+    fecha_inicio = models.DateField(blank=True, null=True)
+    fecha_fin = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'planteles'
+        verbose_name_plural = "Planteles"
+
+    def __unicode__(self):
+        return self.nombre
+
+
+class PlantelesXPersonas(models.Model):
+    plantel_x_persona_id = models.BigIntegerField(primary_key=True)
+    plantel = models.ForeignKey(Planteles)
+    persona = models.ForeignKey(Personas)
+
+    class Meta:
+        managed = False
+        db_table = 'planteles_x_personas'
+
+    @property
+    def nombre_persona(self):
+        return self.persona.apellido + ", " + self.persona.nombre
+
 
