@@ -4,7 +4,4 @@ django-model-utils==2.6
 psycopg2==2.6.2
 python-decouple==3.0
 Unipath==1.1
-django-easy-select2==1.2.5
-django-braces==1.4.0
-simplejson==3.6.5
-django-advanced-filters==1.0.4
+python-dateutil==2.6.0

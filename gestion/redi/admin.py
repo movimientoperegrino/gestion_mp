@@ -1,13 +1,12 @@
 from advanced_filters.admin import AdminAdvancedFiltersMixin
-from django.contrib import admin
 from models import *
 
 
 class PersonaAdmin(AdminAdvancedFiltersMixin, admin.ModelAdmin):
     exclude = ['edad']
     list_display = ("nombre", "apellido", "cedula", "email", "numero_contacto", "activa", "edad")
-    list_filter = ("activa",)
-    advanced_filter_fields = ("nombre", "apellido", "cedula", "email", "numero_contacto", "fecha_nacimiento")
+    list_filter = ("activa","edad")
+    advanced_filter_fields = ("nombre", "apellido", "cedula", "email", "numero_contacto", "fecha_nacimiento", "edad")
 
 
 class ActividadAdmin(admin.ModelAdmin):
