@@ -59,6 +59,13 @@ class Personas(models.Model):
     observacion = models.TextField(blank=True, null=True)
     activa = models.NullBooleanField()
     edad = models.IntegerField(blank=True, null=True)
+    MASCULINO = "M"
+    FEMENINO = "F"
+    SEXO_PERSONA = (
+        (MASCULINO, 'Masculino'),
+        (FEMENINO,'Femenino'),
+    )
+    sexo = models.CharField(max_length=1, choices=SEXO_PERSONA)
 
     @property
     def get_edad(self):
