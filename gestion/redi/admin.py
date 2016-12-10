@@ -12,7 +12,18 @@ class PersonaAdmin(AdminAdvancedFiltersMixin, admin.ModelAdmin):
 class ActividadAdmin(admin.ModelAdmin):
     raw_id_fields = ("persona",)
 
+class PlantelXPersonaInline(admin.TabularInline):
+    model = PlantelesXPersonas
+    raw_id_fields = ("persona","plantel")
+    readonly_fields = ["nombre_persona"]
+
+class PlantelAdmin(admin.ModelAdmin):
+    inlines = [
+        PlantelXPersonaInline,
+    ]
+
 # Register your models here.
 admin.site.register(Personas, PersonaAdmin)
 admin.site.register(Actividades, ActividadAdmin)
 admin.site.register(ActividadesTipos)
+admin.site.register(Planteles, PlantelAdmin)
