@@ -23,6 +23,7 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'actividades',
                 'managed': True,
+                'verbose_name_plural': 'Actividades',
             },
         ),
         migrations.CreateModel(
@@ -34,6 +35,7 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'actividades_tipos',
                 'managed': True,
+                'verbose_name_plural': 'Tipos de actividades',
             },
         ),
         migrations.CreateModel(
@@ -53,9 +55,37 @@ class Migration(migrations.Migration):
                 ('observacion', models.TextField(null=True, blank=True)),
                 ('activa', models.NullBooleanField()),
                 ('edad', models.IntegerField(null=True, blank=True)),
+                ('sexo', models.CharField(default='F', max_length=1, choices=[('M', 'Masculino'), ('F', 'Femenino')])),
             ],
             options={
                 'db_table': 'personas',
+                'managed': True,
+                'verbose_name_plural': 'Personas',
+            },
+        ),
+        migrations.CreateModel(
+            name='Planteles',
+            fields=[
+                ('plantel_id', models.AutoField(serialize=False, primary_key=True)),
+                ('nombre', models.CharField(max_length=255, null=True, blank=True)),
+                ('fecha_inicio', models.DateField(null=True, blank=True)),
+                ('fecha_fin', models.DateField(null=True, blank=True)),
+            ],
+            options={
+                'db_table': 'planteles',
+                'managed': True,
+                'verbose_name_plural': 'Planteles',
+            },
+        ),
+        migrations.CreateModel(
+            name='PlantelesXPersonas',
+            fields=[
+                ('plantel_x_persona_id', models.BigIntegerField(serialize=False, primary_key=True)),
+                ('persona', models.ForeignKey(to='redi.Personas', null=True)),
+                ('plantel', models.ForeignKey(to='redi.Planteles', null=True)),
+            ],
+            options={
+                'db_table': 'planteles_x_personas',
                 'managed': True,
             },
         ),

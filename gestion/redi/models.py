@@ -57,6 +57,14 @@ class Personas(models.Model):
     fecha_retiro_encuentro = models.DateField(blank=True, null=True)
     fecha_retiro_crecimiento = models.DateField(blank=True, null=True)
     fecha_escuela_dirigentes = models.DateField(blank=True, null=True)
+    SOLTERO = "SOLTERO"
+    CASADO = "CASADO"
+    DIVORCIADO = "DIVORCIADO"
+    ESTADO_CIVIL_PERSONA = (
+        (SOLTERO, 'SOLTERO/A'),
+        (CASADO, 'CASADO/A'),
+        (DIVORCIADO, 'DIVORCIADO/A')
+    )
     estado_civil = models.CharField(max_length=255, blank=True, null=True)
     observacion = models.TextField(blank=True, null=True)
     activa = models.NullBooleanField()
@@ -67,7 +75,7 @@ class Personas(models.Model):
         (MASCULINO, 'Masculino'),
         (FEMENINO,'Femenino'),
     )
-    sexo = models.CharField(max_length=1, choices=SEXO_PERSONA)
+    sexo = models.CharField(max_length=1, choices=SEXO_PERSONA, default="F")
 
     @property
     def get_edad(self):
@@ -94,7 +102,7 @@ class Planteles(models.Model):
     fecha_fin = models.DateField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'planteles'
         verbose_name_plural = "Planteles"
 
@@ -103,12 +111,13 @@ class Planteles(models.Model):
 
 
 class PlantelesXPersonas(models.Model):
-    plantel_x_persona_id = models.BigIntegerField(primary_key=True)
-    plantel = models.ForeignKey(Planteles)
-    persona = models.ForeignKey(Personas)
+    plantel_x_persona_id = models.AutoField(primary_key=True)
+    plantel = models.ForeignKey(Planteles, null=True)
+    persona = models.ForeignKey(Personas, null=True)
+    titular = models.NullBooleanField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'planteles_x_personas'
 
     @property
