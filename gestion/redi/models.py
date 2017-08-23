@@ -12,18 +12,21 @@ from datetime import date
 from django.contrib import admin
 from django.db import models
 from dateutil.relativedelta import relativedelta
+from django.contrib.auth.models import User
 
 
 
-class Actividades(models.Model):
-    actividad_id = models.AutoField(primary_key=True)
+
+class Actividad(models.Model):
     fecha_fin = models.DateTimeField(blank=True, null=True)
     fecha_inicio = models.DateTimeField(blank=True, null=True)
     descripcion = models.TextField(blank=True, null=True)
     observacion = models.TextField(blank=True, null=True)
-    actividad_tipo = models.ForeignKey('ActividadesTipos', blank=True, null=True)
+    actividad_tipo = models.ForeignKey('ActividadTipo', blank=True, null=True)
     puntuacion = models.IntegerField()
-    persona = models.ForeignKey('Personas', blank=True, null=True)
+    #persona = models.ForeignKey('Personas', blank=True, null=True)
+    retiro_tipo = models.ForeignKey('RetiroTipo', blank=True, null=True)
+
 
     class Meta:
         managed = True
@@ -33,8 +36,20 @@ class Actividades(models.Model):
     def __unicode__(self):
         return self.descripcion
 
-class ActividadesTipos(models.Model):
-    tipo_id = models.CharField(primary_key=True, max_length=255)
+
+class RetiroTipo(models.Model):
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'retiros_tipos'
+        verbose_name_plural = "Tipos de retiros"
+
+    def __unicode__(self):
+        return self.descripcion
+
+
+class ActividadTipo(models.Model):
     descripcion = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
@@ -46,8 +61,7 @@ class ActividadesTipos(models.Model):
         return self.descripcion
 
 
-class Personas(models.Model):
-    persona_id = models.AutoField(primary_key=True)
+class Persona(models.Model):
     nombre = models.CharField(max_length=255, blank=True, null=True)
     apellido = models.CharField(max_length=255, blank=True, null=True)
     numero_contacto = models.CharField(max_length=255, blank=True, null=True)
@@ -76,6 +90,7 @@ class Personas(models.Model):
         (FEMENINO,'Femenino'),
     )
     sexo = models.CharField(max_length=1, choices=SEXO_PERSONA, default="F")
+    user = models.OneToOneField(User, default=1)
 
     @property
     def get_edad(self):
@@ -92,36 +107,29 @@ class Personas(models.Model):
 
     def save(self, *args, **kwargs):
         self.edad = relativedelta(date.today(), self.fecha_nacimiento).years
-        return super(Personas, self).save(*args, **kwargs)
+        return super(Persona, self).save(*args, **kwargs)
 
 
-class Planteles(models.Model):
-    plantel_id = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=255, blank=True, null=True)
-    fecha_inicio = models.DateField(blank=True, null=True)
-    fecha_fin = models.DateField(blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'planteles'
-        verbose_name_plural = "Planteles"
+class Rol(models.Model):
+    descripcion = models.CharField(max_length=255)
 
     def __unicode__(self):
-        return self.nombre
+        return self.descripcion
 
 
-class PlantelesXPersonas(models.Model):
-    plantel_x_persona_id = models.AutoField(primary_key=True)
-    plantel = models.ForeignKey(Planteles, null=True)
-    persona = models.ForeignKey(Personas, null=True)
-    titular = models.NullBooleanField()
 
-    class Meta:
-        managed = True
-        db_table = 'planteles_x_personas'
-
-    @property
-    def nombre_persona(self):
-        return self.persona.apellido + ", " + self.persona.nombre
-
-
+class ActividadPersona(models.Model):
+    actividad = models.ForeignKey(Actividad)
+    persona = models.ForeignKey(Persona)
+    rol = models.ForeignKey(Rol)
+    ACEPTO = "A"
+    RECHAZO = "R"
+    ESPERA = "E"
+    ESTADO_OPCIONES = (
+        (ACEPTO, 'Acepto'),
+        (RECHAZO,'Rechazo'),
+        (ESPERA, 'Espera'),
+    )
+    estado = models.CharField(max_length=1, choices=ESTADO_OPCIONES, default=ESPERA)
+    titular = models.BooleanField(default=True)
+    observacion = models.TextField(blank=True, null=True)

@@ -2,18 +2,20 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+from django.conf import settings
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Actividades',
+            name='Actividad',
             fields=[
-                ('actividad_id', models.AutoField(serialize=False, primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('fecha_fin', models.DateTimeField(null=True, blank=True)),
                 ('fecha_inicio', models.DateTimeField(null=True, blank=True)),
                 ('descripcion', models.TextField(null=True, blank=True)),
@@ -27,9 +29,19 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='ActividadesTipos',
+            name='ActividadPersona',
             fields=[
-                ('tipo_id', models.CharField(max_length=255, serialize=False, primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('estado', models.CharField(default='E', max_length=1, choices=[('A', 'Acepto'), ('R', 'Rechazo'), ('E', 'Espera')])),
+                ('titular', models.BooleanField(default=True)),
+                ('observacion', models.TextField(null=True, blank=True)),
+                ('actividad', models.ForeignKey(to='redi.Actividad')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='ActividadTipo',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('descripcion', models.CharField(max_length=255, null=True, blank=True)),
             ],
             options={
@@ -39,9 +51,9 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Personas',
+            name='Persona',
             fields=[
-                ('persona_id', models.AutoField(serialize=False, primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('nombre', models.CharField(max_length=255, null=True, blank=True)),
                 ('apellido', models.CharField(max_length=255, null=True, blank=True)),
                 ('numero_contacto', models.CharField(max_length=255, null=True, blank=True)),
@@ -56,6 +68,7 @@ class Migration(migrations.Migration):
                 ('activa', models.NullBooleanField()),
                 ('edad', models.IntegerField(null=True, blank=True)),
                 ('sexo', models.CharField(default='F', max_length=1, choices=[('M', 'Masculino'), ('F', 'Femenino')])),
+                ('user', models.OneToOneField(default=1, to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'db_table': 'personas',
@@ -64,39 +77,42 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='Planteles',
+            name='RetiroTipo',
             fields=[
-                ('plantel_id', models.AutoField(serialize=False, primary_key=True)),
-                ('nombre', models.CharField(max_length=255, null=True, blank=True)),
-                ('fecha_inicio', models.DateField(null=True, blank=True)),
-                ('fecha_fin', models.DateField(null=True, blank=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('descripcion', models.CharField(max_length=255, null=True, blank=True)),
             ],
             options={
-                'db_table': 'planteles',
+                'db_table': 'retiros_tipos',
                 'managed': True,
-                'verbose_name_plural': 'Planteles',
+                'verbose_name_plural': 'Tipos de retiros',
             },
         ),
         migrations.CreateModel(
-            name='PlantelesXPersonas',
+            name='Rol',
             fields=[
-                ('plantel_x_persona_id', models.BigIntegerField(serialize=False, primary_key=True)),
-                ('persona', models.ForeignKey(to='redi.Personas', null=True)),
-                ('plantel', models.ForeignKey(to='redi.Planteles', null=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('descripcion', models.CharField(max_length=255)),
             ],
-            options={
-                'db_table': 'planteles_x_personas',
-                'managed': True,
-            },
         ),
         migrations.AddField(
-            model_name='actividades',
-            name='actividad_tipo',
-            field=models.ForeignKey(blank=True, to='redi.ActividadesTipos', null=True),
-        ),
-        migrations.AddField(
-            model_name='actividades',
+            model_name='actividadpersona',
             name='persona',
-            field=models.ForeignKey(blank=True, to='redi.Personas', null=True),
+            field=models.ForeignKey(to='redi.Persona'),
+        ),
+        migrations.AddField(
+            model_name='actividadpersona',
+            name='rol',
+            field=models.ForeignKey(to='redi.Rol'),
+        ),
+        migrations.AddField(
+            model_name='actividad',
+            name='actividad_tipo',
+            field=models.ForeignKey(blank=True, to='redi.ActividadTipo', null=True),
+        ),
+        migrations.AddField(
+            model_name='actividad',
+            name='retiro_tipo',
+            field=models.ForeignKey(blank=True, to='redi.RetiroTipo', null=True),
         ),
     ]
